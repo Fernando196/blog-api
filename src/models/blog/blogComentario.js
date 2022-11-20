@@ -3,12 +3,13 @@ module.exports = function(sequelize, DataTypes) {
 		idComentario: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			autoIncrement: true,
 			primaryKey: true,
 			field: 'idComentario'
 		},
 		idBlog: {
 			type: DataTypes.INTEGER,
-			allowNull: true,
+			allowNull: false,
 			field: 'idBlog'
 		},
 		comentario: {
@@ -18,17 +19,14 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		idUsuarioCreacion: {
 			type: DataTypes.INTEGER,
-			allowNull: true,
-			references: {
-				model: 'usuario',
-				key: 'idUsuario'
-			},
+			allowNull: false,
 			field: 'idUsuarioCreacion'
 		},
 		fechaCreacion: {
 			type: DataTypes.DATE,
-			allowNull: true,
-			field: 'fechaCreacion'
+			allowNull: false,
+			field: 'fechaCreacion',
+			defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
 		},
 		idUsuarioModificacion: {
 			type: DataTypes.INTEGER,
@@ -47,12 +45,12 @@ module.exports = function(sequelize, DataTypes) {
 
 	BlogComentario.associate = (models)=>{
 		BlogComentario.belongsTo(models.blog.Usuario,{
-			foreingKey:'idUsuarioCreacion',
+			foreignKey:'idUsuarioCreacion',
 			targetKey:'idUsuario',
 			as:'UsuarioCreacion'
 		});
 		BlogComentario.belongsTo(models.blog.Usuario,{
-			foreingKey:'idUsuarioModificacion',
+			foreignKey:'idUsuarioModificacion',
 			targetKey:'idUsuario',
 			as:'UsuarioModificacion'
 		});

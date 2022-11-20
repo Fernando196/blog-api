@@ -24,14 +24,31 @@ class BlogService{
                         as:'UsuarioModificacion',
                         attributes:[ 'nombre', 'apellidoPaterno', 'apellidoMaterno' ]
                     },
+                    {
+                        model: models.blog.BlogComentario,
+                        as:'Comentarios',
+                        attributes:[ 'idComentario','comentario' ],
+                        include:[
+                            {
+                                model: models.blog.Usuario,
+                                as:'UsuarioCreacion',
+                                attributes:[ 'nombre', 'apellidoPaterno', 'apellidoMaterno' ]
+                            },
+                            {
+                                model: models.blog.Usuario,
+                                as:'UsuarioModificacion',
+                                attributes:[ 'nombre', 'apellidoPaterno', 'apellidoMaterno' ]
+                            },
+                        ]
+                    }
                 ]
             });
 
             return blog
                 ? new AppResponse( 200, blog ) 
-                : new AppResponse( 404, null , "No se encontro blog");
-        } catch (error) {
-            throw error;
+                : new AppResponse( 404, null , "No se encontro informacion de blog");
+        } catch (err) {
+            throw err;
         }
     }
     async searchBlog(req){
@@ -46,7 +63,6 @@ class BlogService{
                 : new AppResponse(500, null, 'No se encontraron resultados al titulo buscado.');
 
         }catch(err){
-            console.log(err)
             throw err;
         }
     }
@@ -55,26 +71,30 @@ class BlogService{
             let { idUsuario }     = req.userData;
             let archivo           = req.file;
             let blog              = req.body;
+
+            if(!blog?.titulo || !blog?.html) return new AppResponse(500,null,'No cumple con los datos requeridos para crear blog: (titulo y html)');
             
-            let { originalname: nombre } = archivo;
+            blog.idBlog = null;
 
-            let extName = path.extname(nombre);
+            if(archivo){
+                let { originalname: nombre } = archivo;
 
-            if(!['.png','.jpg','.jpeg','.gif'].includes(extName)) return new AppResponse(500,null,'La extencion no pertence a una imagen permitidos: (png,jpeg,jpg,gif)');
+                let extName = path.extname(nombre);
 
-            let { url,nombreServer } = await this.createImgBlogS3(archivo);
+                if(!['.png','.jpg','.jpeg','.gif'].includes(extName)) return new AppResponse(500,null,'La extencion no pertence a una imagen permitidos: (png,jpeg,jpg,gif)');
 
-            blog.idBlog            = null;
-            blog.idUsuarioCreacion = idUsuario;
-            blog.nombreImgServer   = nombreServer;
-            blog.nombreImg         = nombre;
-            blog.urlImgCabecera    = url;
+                let { url,nombreServer } = await this.createImgBlogS3(archivo);
+                blog.idUsuarioCreacion = idUsuario;
+                blog.nombreImgServer   = nombreServer;
+                blog.nombreImg         = nombre;
+                blog.urlImgCabecera    = url;
+            }
             
             let blogCreado = await models.blog.Blog.create(blog);
 
-            return new AppResponse( 200, blogCreado )
-        } catch (error) {
-            throw error;
+            return new AppResponse( 200, blogCreado, 'Blog creado correctamente')
+        } catch (err) {
+            throw err;
         }
     }
     async putBlog(req) {
@@ -109,10 +129,9 @@ class BlogService{
 
             await models.blog.Blog.update(blog, { where: { idBlog } });
 
-            return new AppResponse(200,'Blog actualizado correctamente')
-        } catch (error) {
-            console.log(error);
-            throw error;
+            return new AppResponse( 200, null, 'Blog actualizado correctamente')
+        } catch (err) {
+            throw err;
         }
     }
     async deleteBlog(req) {
@@ -129,9 +148,9 @@ class BlogService{
 
             let blog = await models.blog.Blog.destroy({ where: { idBlog } });
             await models.blog.BlogComentario.destroy({ where: { idBlog } });
-            return new AppResponse(200,'Blog eliminado correctamente');
-        } catch (error) {
-            throw error;
+            return new AppResponse(200 ,null ,'Blog eliminado correctamente');
+        } catch (err) {
+            throw err;
         }
     }
 
@@ -145,6 +164,107 @@ class BlogService{
                 url,
                 nombreServer: nameFile
             }
+        }catch(err){
+            throw err;
+        }
+    }
+
+    async getComentario(req){
+        try{
+            let { id: idComentario } = req.params;
+
+            let existComentario = await models.blog.BlogComentario.findOne({ where: { idComentario } })
+
+            if(!existComentario) return new AppResponse(500,null,'No se encontro informacion del comentario.');
+
+            let comentario = await models.blog.BlogComentario.findOne({
+                where:{ idComentario },
+                include:[
+                    {
+                        model: models.blog.Usuario,
+                        as:'UsuarioCreacion',
+                        attributes:[ 'nombre', 'apellidoPaterno', 'apellidoMaterno' ]
+                    },
+                    {
+                        model: models.blog.Usuario,
+                        as:'UsuarioModificacion',
+                        attributes:[ 'nombre', 'apellidoPaterno', 'apellidoMaterno' ]
+                    },
+                ]
+            });
+
+            return new AppResponse(200,comentario);
+        }catch(err){
+            throw err;
+        }
+    }
+
+    async createComentario(req){
+        try{
+            let { idUsuario } = req.userData;
+            let { id: idBlog } = req.params;
+            let comentario = req.body;
+            
+            comentario.idComentario      = null;
+            comentario.idUsuarioCreacion = idUsuario;
+            comentario.idBlog            = idBlog;
+
+            let exist = await models.blog.Blog.findOne({ where: { idBlog } })
+
+            if(!exist) return new AppResponse(500,null,'No existe blog para agregar comentario.');
+            
+            let newComentario = await models.blog.BlogComentario.create(comentario);
+
+            return new AppResponse(200, newComentario, 'Comentario creado correctamente.');
+        }catch(err){
+            throw err;
+        }
+    }
+    async putComentario(req){
+        try{
+            let { idUsuario } = req.userData;
+            let { id: idBlog, idComentario } = req.params;
+            let comentario = req.body;
+
+            if(!comentario?.comentario) return new AppResponse(500,null,'No cuenta con comentario para actualizar.');
+
+            let existBlog = await models.blog.Blog.findOne({ where: { idBlog } })
+
+            if(!existBlog) return new AppResponse(500,null,'No existe blog para agregar comentario.');
+
+            delete comentario.idComentario;
+            delete comentario.idBlog;
+            comentario.idUsuarioModificacion = idUsuario;
+
+            let existComentario = await models.blog.BlogComentario.findOne({ where: { idComentario } });
+
+            if(!existComentario) return new AppResponse(500,null,'No existe comentario para actualizar');
+            
+            let comentarioActualizado = await models.blog.BlogComentario.update(comentario,{ where: { idBlog, idComentario } });
+            await models.blog.Blog.update({ idUsuarioModificacion: idUsuario }, { where: { idBlog } } );
+
+            return new AppResponse(200, null, 'Comentario actualizado correctamente');
+        }catch(err){
+            throw err;
+        }
+    }
+    async deleteComentario(req){
+        try{
+            let { idUsuario } = req.userData;
+            let { id: idBlog, idComentario } = req.params;
+
+            let existBlog = await models.blog.Blog.findOne({ where: { idBlog } })
+
+            if(!existBlog) return new AppResponse(500,null,'No existe blog para eliminar comentario.');
+            
+            let existComentario = await models.blog.BlogComentario.findOne({ where: { idComentario } })
+
+            if(!existComentario) return new AppResponse(500,null,'No existe comentario para eliminar.');
+
+            await models.blog.BlogComentario.destroy({ where: { idBlog, idComentario } });
+            await models.blog.Blog.update({ idUsuarioModificacion: idUsuario },{ where: { idBlog } });
+
+            return new AppResponse(200, null, 'Comentario eliminado correctamente.');
         }catch(err){
             throw err;
         }

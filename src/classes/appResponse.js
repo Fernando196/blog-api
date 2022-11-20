@@ -1,11 +1,21 @@
 class AppResponse{
-    constructor(code,data=null,errMsg=null){
+    constructor(code,data=null,msg = null){
         this.code   = code;
         this.data   = data;
-        this.errMsg = errMsg;
+        this.msg    = msg;
+        if(Number(code) === 200){
+            this.data = {
+                estatus: 'done',
+                msg    : this.msg,
+                data   : this.data
+            }
+            if(!data) delete this.data.data;
+            if(!msg)  delete this.data.msg;
+        }
         if(Number(code) >= 400){
             this.data = {
-                'error': errMsg,
+                estatus : 'error',
+                msg     : this.msg
             };
         }
     }

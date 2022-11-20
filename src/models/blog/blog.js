@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		titulo: {
 			type: DataTypes.STRING(300),
-			allowNull: true,
+			allowNull: false,
 			field: 'titulo'
 		},
 		nombreImg:{
@@ -29,21 +29,17 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		html: {
 			type: DataTypes.TEXT,
-			allowNull: true,
+			allowNull: false,
 			field: 'html'
 		},
 		idUsuarioCreacion: {
 			type: DataTypes.INTEGER,
-			allowNull: true,
-			references: {
-				model: 'usuario',
-				key: 'idUsuario'
-			},
+			allowNull: false,
 			field: 'idUsuarioCreacion'
 		},
 		fechaCreacion: {
 			type: DataTypes.DATE,
-			allowNull: true,
+			allowNull: false,
 			field: 'fechaCreacion',
 			defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
 		},

@@ -65,4 +65,51 @@ router.delete("/:id", (req, res) => {
         });
 });
 
+
+// Comentario
+
+router.get('/comentario/:id', (req, res)=>{
+    BlogService
+        .getComentario(req)
+        .then(response => {
+            res.status(response.code).send(response.data);
+        })
+        .catch(err => {
+            res.status(500).send();
+        });
+});
+
+router.post('/:id/comentario', (req, res)=>{
+    BlogService
+        .createComentario(req)
+        .then(response => {
+            res.status(response.code).send(response.data);
+        })
+        .catch(err => {
+            res.status(500).send();
+        });
+});
+
+router.put('/:id/comentario/:idComentario', (req, res)=>{
+    BlogService
+        .putComentario(req)
+        .then(response => {
+            res.status(response.code).send(response.data);
+        })
+        .catch(err => {
+            res.status(500).send();
+        });
+});
+
+router.delete('/:id/comentario/:idComentario', (req, res)=>{
+    BlogService
+        .deleteComentario(req)
+        .then(response => {
+            res.status(response.code).send(response.data);
+        })
+        .catch(err => {
+            res.status(500).send();
+        });
+});
+
 module.exports = router;
