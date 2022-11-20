@@ -49,3 +49,14 @@ if( process.env.NODE_ENV === 'production' ){
 }
 
 process.env.DBDATA = JSON.stringify(dbData);
+
+// AWS
+
+process.env.AWS_BUCKET_NAME   = "image-app-node";
+process.env.AWS_BUCKET_REGION = 'us-east-2';
+process.env.AWS_ACCESS_KEY     = 'AKIAUCHPHZUVATRS22GY';
+process.env.AWS_SECRET_KEY    = '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';
+
+// AWS FOLDER
+
+process.env.AWS_IMAGES_FOLDER = 'node/image/';

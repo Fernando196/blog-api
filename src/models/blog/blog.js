@@ -3,6 +3,7 @@ module.exports = function(sequelize, DataTypes) {
 		idBlog: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			autoIncrement: true,
 			primaryKey: true,
 			field: 'idBlog'
 		},
@@ -11,8 +12,18 @@ module.exports = function(sequelize, DataTypes) {
 			allowNull: true,
 			field: 'titulo'
 		},
+		nombreImg:{
+			type: DataTypes.TEXT,
+			allowNull: true,
+			field: 'nombreImg'
+		},
+		nombreImgServer:{
+			type: DataTypes.TEXT,
+			allowNull: true,
+			field: 'nombreImgServer'
+		},
 		urlImgCabecera: {
-			type: DataTypes.STRING(300),
+			type: DataTypes.STRING(500),
 			allowNull: true,
 			field: 'urlImgCabecera'
 		},
