@@ -44,7 +44,7 @@ router.post("/",memoryUpload.single('file'), (req, res) => {
             res.status(500).send();
         });
 });
-router.put("/:id", (req, res) => {
+router.put("/:id",memoryUpload.single('file'), (req, res) => {
     BlogService
         .putBlog(req)
         .then(response => {

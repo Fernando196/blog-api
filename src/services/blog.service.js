@@ -52,8 +52,8 @@ class BlogService{
     }
     async createBlog(req) {
         try {
-            let archivo           = req.file;
             let { idUsuario }     = req.userData;
+            let archivo           = req.file;
             let blog              = req.body;
             
             let { originalname: nombre } = archivo;
@@ -62,15 +62,11 @@ class BlogService{
 
             if(!['.png','.jpg','.jpeg','.gif'].includes(extName)) return new AppResponse(500,null,'La extencion no pertence a una imagen permitidos: (png,jpeg,jpg,gif)');
 
-            let folder   = process.env.AWS_IMAGES_FOLDER;
-
-            let nameFile = uuidv4() + path.extname(nombre);
-
-            let url = await utilitiesService.uploadFileS3( `${folder}${nameFile}` , archivo.buffer );
+            let { url,nombreServer } = await this.createImgBlogS3(archivo);
 
             blog.idBlog            = null;
             blog.idUsuarioCreacion = idUsuario;
-            blog.nombreImgServer   = nameFile;
+            blog.nombreImgServer   = nombreServer;
             blog.nombreImg         = nombre;
             blog.urlImgCabecera    = url;
             
@@ -83,33 +79,74 @@ class BlogService{
     }
     async putBlog(req) {
         try {
-            let { body: blog, params } = req;
-            let { id: idBlog } = params;
-            delete blog.idBlog;
-            let blogActualizado = await models.blog.Blog.update(blog, { where: { idBlog } });
-            return new AppResponse(200,blogActualizado)
-        } catch (error) {
-            throw error;
-        }
-    }
-    async patchBlog(){
-        try{
-            let { body: data, params } = req;
-            let { id: idBlog } = params;
+            let { id: idBlog } = req.params;
+            let { idUsuario }  = req.userData;
+            let archivo        = req.file;
+            let blog           = req.body;
 
-            let blogActualizado = await models.blog.Blog.update(data, { where: { idBlog } });
-            return new AppResponse(200,blogActualizado)
-        }catch(error){
+            delete blog.idBlog;
+
+            let existBlog = await models.blog.Blog.findOne({ where: { idBlog } });
+
+            if(!existBlog) return new AppResponse(500,null,'No existe el blog a actualizar.');
+
+            if(archivo && existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
+                await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
+            }
+
+            if(archivo){
+                let { originalname: nombre } = archivo;
+
+                let extName = path.extname(nombre);
+
+                if(!['.png','.jpg','.jpeg','.gif'].includes(extName)) return new AppResponse(500,null,'La extencion no pertence a una imagen permitidos: (png,jpeg,jpg,gif)');
+
+                let { url,nombreServer } = await this.createImgBlogS3(archivo);
+                blog.urlImgCabecera      = url;
+                blog.nombreImg           = nombre.originalname;
+                blog.nombreImgServer     = nombreServer;
+            }
+
+            await models.blog.Blog.update(blog, { where: { idBlog } });
+
+            return new AppResponse(200,'Blog actualizado correctamente')
+        } catch (error) {
+            console.log(error);
             throw error;
         }
     }
     async deleteBlog(req) {
         try {
             let { id: idBlog } = req.params;
-            let blog = await models.blog.Blog.update({ activo: 0 }, { where: { idBlog } });
-            return new AppResponse(200,blog)
+
+            let existBlog = await models.blog.Blog.findOne({where: { idBlog } });
+
+            if(!existBlog) return new AppResponse(500,null,'No existe el blog a eliminar.');
+
+            if(existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
+                await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
+            }
+
+            let blog = await models.blog.Blog.destroy({ where: { idBlog } });
+            await models.blog.BlogComentario.destroy({ where: { idBlog } });
+            return new AppResponse(200,'Blog eliminado correctamente');
         } catch (error) {
             throw error;
+        }
+    }
+
+    async createImgBlogS3(archivo){
+        try{
+            let { originalname: nombre } = archivo;
+            let nameFile = uuidv4() + path.extname(nombre);
+            let url      = await utilitiesService.uploadFileS3( nameFile , archivo.buffer );
+
+            return {
+                url,
+                nombreServer: nameFile
+            }
+        }catch(err){
+            throw err;
         }
     }
 }
