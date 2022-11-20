@@ -44,7 +44,8 @@ module.exports = function(sequelize, DataTypes) {
 		fechaCreacion: {
 			type: DataTypes.DATE,
 			allowNull: true,
-			field: 'fechaCreacion'
+			field: 'fechaCreacion',
+			defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
 		},
 		idUsuarioModificacion: {
 			type: DataTypes.INTEGER,
@@ -63,17 +64,17 @@ module.exports = function(sequelize, DataTypes) {
 
 	Blog.associate = (models)=>{
 		Blog.belongsTo(models.blog.Usuario,{
-			foreingKey:'idUsuarioCreacion',
+			foreignKey:'idUsuarioCreacion',
 			targetKey:'idUsuario',
 			as:'UsuarioCreacion'
 		});
 		Blog.belongsTo(models.blog.Usuario,{
-			foreingKey:'idUsuarioModificacion',
+			foreignKey:'idUsuarioModificacion',
 			targetKey:'idUsuario',
 			as:'UsuarioModificacion'
 		});
 		Blog.hasMany(models.blog.BlogComentario,{
-			foreingKey:'idBlog',
+			foreignKey:'idBlog',
 			as:'Comentarios'
 		})
 	}

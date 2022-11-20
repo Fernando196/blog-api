@@ -14,6 +14,16 @@ router.get("/", (req, res) => {
             res.status(500).send();
         });
 });
+router.get("/buscar", (req, res) => {
+    BlogService
+        .searchBlog(req)
+        .then(response => {
+            res.status(response.code).send(response.data);
+        })
+        .catch(err => {
+            res.status(500).send();
+        });
+});
 router.get("/:id", (req, res) => {
     BlogService
         .getBlog(req)

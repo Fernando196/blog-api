@@ -13,6 +13,6 @@ app.use( '/auth'    , auth );
 app.use( '/usuario' , usuario );
 
 //Blog
-app.use( '/blog' , blog);
+app.use( '/blog'    , blog);
 
 module.exports = app;
