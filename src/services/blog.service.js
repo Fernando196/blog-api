@@ -111,7 +111,7 @@ class BlogService{
             if(!existBlog) return new AppResponse(500,null,'No existe el blog a actualizar.');
 
             if(archivo && existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
-                await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
+                let deleteFile = await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
             }
 
             if(archivo){
@@ -143,7 +143,7 @@ class BlogService{
             if(!existBlog) return new AppResponse(500,null,'No existe el blog a eliminar.');
 
             if(existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
-                await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
+                let deleteFile  = await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
             }
 
             let blog = await models.blog.Blog.destroy({ where: { idBlog } });

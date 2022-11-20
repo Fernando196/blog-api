@@ -54,8 +54,8 @@ process.env.DBDATA = JSON.stringify(dbData);
 
 process.env.AWS_BUCKET_NAME   = "image-app-node";
 process.env.AWS_BUCKET_REGION = 'us-east-2';
-process.env.AWS_ACCESS_KEY    = 'AKIAUCHPHZUVAAP3L7XI';
-process.env.AWS_SECRET_KEY    = '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';
+process.env.AWS_ACCESS_KEY    = 'AKIAUCHPHZUVMWH5QLNR';
+process.env.AWS_SECRET_KEY    = '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';
 
 // AWS FOLDER
 

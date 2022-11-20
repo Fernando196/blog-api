@@ -32,10 +32,11 @@ class UtilitiesService{
                 Key   : `${folder}${nombre}`
             }
 
-            return await s3.deleteObject(params).promise();
-
+            await s3.deleteObject(params).promise();
+            return true
+            
         }catch(err){
-            throw err;
+            return false
         }
     }
 }
