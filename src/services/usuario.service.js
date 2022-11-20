@@ -47,7 +47,7 @@ class UsuarioService{
             usuario.password = bcrypt.hashSync(usuario.password)
             let usuarioCreado = await models.blog.Usuario.create(usuario);
 
-            return new AppResponse(200,'Usuario creado correctamente.',usuarioCreado);
+            return new AppResponse(200,usuarioCreado,'Usuario creado correctamente.');
         } catch (err) {
             throw err;
         }
