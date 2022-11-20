@@ -74,7 +74,6 @@ class UsuarioService{
             let usuarioActualizado = await models.blog.Usuario.update(usuario, { where: { idUsuario } });
             return new AppResponse(200, null, 'Usuario actualizado correctamente.');
         } catch (err) {
-            console.log(err)
             throw err;
         }
     }
@@ -110,7 +109,6 @@ class UsuarioService{
             await models.blog.Usuario.destroy({ where: { idUsuario } });
             return new AppResponse(200, null, 'Usuario eliminado correctamente');
         } catch (err) {
-            console.log(err)
             throw err;
         }
     }
