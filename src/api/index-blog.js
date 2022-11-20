@@ -8,7 +8,7 @@ var { expressjwt: jwt } = require('express-jwt');
 const routers = require('./routers');
 
 let unprotected = [
-    '/api/auth',
+    '/api/auth/',
     '/api/usuario/registro'
 ]
 

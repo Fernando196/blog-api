@@ -14,15 +14,4 @@ router.post('/',(req,res)=>{
         });
 });
 
-router.post('/',(req,res) => {
-    AuthService
-        .refreshToken(req)
-        .then(response => {
-            res.status(response.code).send(response.data)
-        })
-        .catch(err => {
-            res.status(500).send();
-        });
-})
-
 module.exports = router;
