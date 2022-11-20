@@ -53,5 +53,13 @@ module.exports = function(sequelize, DataTypes) {
 		timestamps: false,
 	});
 
+	Usuario.associate = (models) => {
+		Usuario.belongsTo(models.blog.Usuario, {
+			foreignKey : 'idUsuarioModificacion',
+			targetKey  : 'idUsuario',
+			as		   : 'UsuarioModificacion'
+		})
+	}
+
 	return Usuario;
 };
