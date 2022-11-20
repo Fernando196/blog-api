@@ -2,7 +2,7 @@ process.env.PORT = 51000;
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // TOKEN
-process.env.SEED_API_BLOG = 'clase-secreta-blog';
+process.env.SEED_API_BLOG = 'clave-secreta-blog';
 process.env.TOKEN_EXPIRATION = 60 * 60;
 
 let dbData;

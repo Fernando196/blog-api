@@ -17,7 +17,7 @@ app.use(cors());
 app.use(
     jwt({
         secret: process.env.SEED_API_BLOG,
-        algorithms: ['ES256'],
+        algorithms: [ "HS256" ],
         requestProperty: 'userData'
     }).unless({
         path: unprotected
