@@ -3,6 +3,7 @@ module.exports = function(sequelize, DataTypes) {
 		idUsuario: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			autoIncrement: true,
 			primaryKey: true,
 			field: 'idUsuario'
 		},
@@ -30,6 +31,12 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.STRING(100),
 			allowNull: true,
 			field: 'apellidoMaterno'
+		},
+		fechaCreacion: {
+			type: DataTypes.DATE,
+			allowNull: true,
+			field: 'fechaCreacion',
+			defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
 		},
 		idUsuarioModificacion: {
 			type: DataTypes.INTEGER,

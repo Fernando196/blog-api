@@ -10,4 +10,3 @@ app.use( '/auth'    , auth );
 app.use( '/usuario' , usuario );
 
 module.exports = app;
-

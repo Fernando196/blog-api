@@ -14,7 +14,7 @@ if( process.env.NODE_ENV === 'production' ){
                 password : 'AzeCryHMjVdQ4',
                 database : 'db_blog',
                 options  : {
-                    timezone: '- 06:00',
+                    timezone: '-06:00',
                     host: 'db-challenge.cfpi6eqoszpg.us-east-2.rds.amazonaws.com',
                     port: 3306,
                     dialect: 'mysql',
@@ -33,7 +33,7 @@ if( process.env.NODE_ENV === 'production' ){
                 password : 'AzeCryHMjVdQ4',
                 database : 'db_blog',
                 options  : {
-                    timezone: '- 06:00',
+                    timezone: '-06:00',
                     host: 'db-challenge.cfpi6eqoszpg.us-east-2.rds.amazonaws.com',
                     port: 3306,
                     dialect: 'mysql',

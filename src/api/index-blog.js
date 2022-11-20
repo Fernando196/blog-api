@@ -5,7 +5,7 @@ const http    = require('http');
 const https   = require('https');
 const cors    = require('cors');
 var { expressjwt: jwt } = require('express-jwt');
-// const routers = require('./routers');
+const routers = require('./routers');
 
 let unprotected = [
     '/api/auth',
@@ -23,6 +23,8 @@ app.use(
         path: unprotected
     })
 );
+
+app.use('/api',routers); //Routers
 
 const port = process.env.PORT;
 

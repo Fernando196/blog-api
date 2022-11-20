@@ -14,7 +14,6 @@ for (let i = 0; i < databases.length; ++i) {
   let dbConfig = config.databases[database];
   console.log(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig);
   db[database] = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig.options);
-  db[database].dialect.supports.schemas = true;
 
   fs.readdirSync(__dirname + `/${database}`)
     .filter((file) => {

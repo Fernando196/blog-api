@@ -4,9 +4,9 @@ class AppResponse{
         this.data   = data;
         this.errMsg = errMsg;
         if(Number(code) >= 400){
-            this.err = true;
-        }else{
-            this.err = false
+            this.data = {
+                'error': errMsg,
+            };
         }
     }
 }
