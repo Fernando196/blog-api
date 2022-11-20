@@ -8,6 +8,8 @@ const jwt    = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
 class AuthService{
+
+    // Valores para token
     getTokenPayLoad(user){
         return{
             idUsuario: user.idUsuario,
@@ -27,6 +29,7 @@ class AuthService{
 
             if(!user) return new AppResponse(500,null,'Credenciales invalidas');
 
+            // Validamos que las password para revisar si es la credencial es valida.
             if(bcrypt.compareSync(usuario.password,user.password)){
                 
                 user = this.getTokenPayLoad(user);

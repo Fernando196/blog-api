@@ -32,16 +32,6 @@ router.put("/:id", (req, res) => {
             res.status(500).send();
         });
 });
-router.patch("/:id", (req, res) => {
-    UsuarioService
-        .putUsuario(req)
-        .then(response => {
-            res.status(response.code).send(response.data);
-        })
-        .catch(err => {
-            res.status(500).send();
-        });
-});
 router.delete("/:id", (req, res) => {
     UsuarioService
         .deleteUsuario(req)

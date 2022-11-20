@@ -36,14 +36,17 @@ class UsuarioService{
             if(!usuario?.password || !usuario?.email || !usuario?.nombre){
                 return new AppResponse(500,null,'No cumple con los datos requeridos para crear usuario: (email,password,nombre)')
             }
-
+            
+            // Revisamos email existe, en caso que exista enviar error.
             let existEmail = await models.blog.Usuario.findOne({ where: { email: usuario.email } });
 
             if(existEmail){
                 return new AppResponse(500,null,'El email ya se encuentra en uso.');
             }
-
+            
+            // Se elimina id primario para no causar conflicto al crear usuario.
             usuario.idUsuario = null;
+            // Se aplica encryptacion a password.
             usuario.password = bcrypt.hashSync(usuario.password)
             let usuarioCreado = await models.blog.Usuario.create(usuario);
 
@@ -62,13 +65,17 @@ class UsuarioService{
 
             if(!existUsuario) return new AppResponse(500, null, 'No existe usuario para actualizar' );
 
+            //Revisamos si estamos actualizando el email y verificar el si ya esta en uso.
             if(usuario?.email){
                 let existEmail = await models.blog.Usuario.findOne({ where: { email: usuario.email } });
 
                 if(existEmail) return new AppResponse(500,null,'El email que se intenta cambiar, ya se encuentra en uso.');
             }
 
+            //Se elimina id primario para no causar conflicto al modificar usuario;
             delete usuario.idUsuario;
+
+            //Se agrega idUsuario modificacion para llevar un registro.
             usuario.idUsuarioModificacion = idUsuarioModificacion;
 
             let usuarioActualizado = await models.blog.Usuario.update(usuario, { where: { idUsuario } });
@@ -94,7 +101,6 @@ class UsuarioService{
                     } 
                 }
             });
-
             let comentarios = await models.blog.BlogComentario.findOne({
                 where: { 
                     [Op.or]: {
@@ -104,6 +110,7 @@ class UsuarioService{
                 }
             });
 
+            // Enviamos mensaje de error en caso que existe blog o comentario existente.
             if(blog ||  comentarios) return new AppResponse(500, null, 'El usuario tiene informacion capturada, favor de eliminar para proceder a eliminar usuario.');
 
             await models.blog.Usuario.destroy({ where: { idUsuario } });

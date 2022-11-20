@@ -53,9 +53,9 @@ class BlogService{
     }
     async searchBlog(req){
         try{
-            
             let { titulo } = req.query;
 
+            // Utilizamos operadores de sequelize para aplicar like %valor% para la busqueda por titulo
             let blogs = await models.blog.Blog.findAll({ where: { titulo: { [Op.substring]: titulo } } });
 
             return blogs?.length
@@ -72,18 +72,24 @@ class BlogService{
             let archivo           = req.file;
             let blog              = req.body;
 
+            // Enviamos mensaje de error en caso que no cumpla con los datos minimos
             if(!blog?.titulo || !blog?.html) return new AppResponse(500,null,'No cumple con los datos requeridos para crear blog: (titulo y html)');
             
             blog.idBlog = null;
 
+            // Validamos si existe archivo agregado en la peticion en caso omiso se procede a crear bllog.
             if(archivo){
                 let { originalname: nombre } = archivo;
 
                 let extName = path.extname(nombre);
 
+                // Validamos que el archivo a subir cumpla con las extenciones validas.
                 if(!['.png','.jpg','.jpeg','.gif'].includes(extName)) return new AppResponse(500,null,'La extencion no pertence a una imagen permitidos: (png,jpeg,jpg,gif)');
 
+                // Subimos el archivo al aws S3
                 let { url,nombreServer } = await this.createImgBlogS3(archivo);
+
+                // Agregamos propiedades del archivo al objeto blog para su creacion.
                 blog.idUsuarioCreacion = idUsuario;
                 blog.nombreImgServer   = nombreServer;
                 blog.nombreImg         = nombre;
@@ -109,22 +115,24 @@ class BlogService{
             let existBlog = await models.blog.Blog.findOne({ where: { idBlog } });
 
             if(!existBlog) return new AppResponse(500,null,'No existe el blog a actualizar.');
-
-            if(archivo && existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
-                let deleteFile = await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
-            }
-
+            
             if(archivo){
                 let { originalname: nombre } = archivo;
 
                 let extName = path.extname(nombre);
 
+                // Validamos si el nuevo archivo cumple con la extencion valida.
                 if(!['.png','.jpg','.jpeg','.gif'].includes(extName)) return new AppResponse(500,null,'La extencion no pertence a una imagen permitidos: (png,jpeg,jpg,gif)');
 
                 let { url,nombreServer } = await this.createImgBlogS3(archivo);
                 blog.urlImgCabecera      = url;
                 blog.nombreImg           = nombre.originalname;
                 blog.nombreImgServer     = nombreServer;
+            }
+
+            // En caso de tener imagen ya almacenada, validamos y procedemos a eliminar en s3.
+            if(archivo && existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
+                let deleteFile = await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
             }
 
             await models.blog.Blog.update(blog, { where: { idBlog } });
@@ -142,6 +150,7 @@ class BlogService{
 
             if(!existBlog) return new AppResponse(500,null,'No existe el blog a eliminar.');
 
+            // Si existe imagen almacenada en s3, procedemos a eliminar.
             if(existBlog?.urlImgCabecera && existBlog?.nombreImgServer){
                 let deleteFile  = await utilitiesService.deleteFileS3(existBlog.nombreImgServer);
             }
@@ -205,13 +214,17 @@ class BlogService{
             let { id: idBlog } = req.params;
             let comentario = req.body;
             
+            // Validamos si existe el blog para crear comentario.
+            let existBlog = await models.blog.Blog.findOne({ where: { idBlog } })
+
+            if(!existBlog) return new AppResponse(500,null,'No existe blog para agregar comentario.');
+
+            // Eliminamos id primario para no causar conflicto al crear comentario.
             comentario.idComentario      = null;
+
+            // Agregamos propiedades para poder crear comentario.
             comentario.idUsuarioCreacion = idUsuario;
             comentario.idBlog            = idBlog;
-
-            let exist = await models.blog.Blog.findOne({ where: { idBlog } })
-
-            if(!exist) return new AppResponse(500,null,'No existe blog para agregar comentario.');
             
             let newComentario = await models.blog.BlogComentario.create(comentario);
 
@@ -226,14 +239,19 @@ class BlogService{
             let { id: idBlog, idComentario } = req.params;
             let comentario = req.body;
 
+            // Validamos que cumpla con la propiedad comentario, en caso omiso enviar mensaje de error.
             if(!comentario?.comentario) return new AppResponse(500,null,'No cuenta con comentario para actualizar.');
 
+            // Validamos que existe el blog en el cual vamos a crear el comentario.
             let existBlog = await models.blog.Blog.findOne({ where: { idBlog } })
 
             if(!existBlog) return new AppResponse(500,null,'No existe blog para agregar comentario.');
 
+            // Eliminamos llaves para no causar conflicto al modificar comentario.
             delete comentario.idComentario;
             delete comentario.idBlog;
+            
+            // Agregamos propiedad de usuario que modifica el comentario.
             comentario.idUsuarioModificacion = idUsuario;
 
             let existComentario = await models.blog.BlogComentario.findOne({ where: { idComentario } });
@@ -241,7 +259,6 @@ class BlogService{
             if(!existComentario) return new AppResponse(500,null,'No existe comentario para actualizar');
             
             let comentarioActualizado = await models.blog.BlogComentario.update(comentario,{ where: { idBlog, idComentario } });
-            await models.blog.Blog.update({ idUsuarioModificacion: idUsuario }, { where: { idBlog } } );
 
             return new AppResponse(200, null, 'Comentario actualizado correctamente');
         }catch(err){
@@ -261,6 +278,7 @@ class BlogService{
 
             if(!existComentario) return new AppResponse(500,null,'No existe comentario para eliminar.');
 
+            // Eliminamos comentario y actualizamos blog el usuario que modifica.
             await models.blog.BlogComentario.destroy({ where: { idBlog, idComentario } });
             await models.blog.Blog.update({ idUsuarioModificacion: idUsuario },{ where: { idBlog } });
 
