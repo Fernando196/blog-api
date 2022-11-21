@@ -5,7 +5,7 @@
   "main": "index-blog.js",
   "scripts": {
     "test": "nodemon src/api/index-blog.js",
-    "start": "NODE_ENV = production node src/api/index-blog/js"
+    "start": "node src/api/index-blog/js"
   },
   "keywords": [],
   "author": "",
