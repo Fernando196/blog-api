@@ -5,7 +5,12 @@
   "main": "index-blog.js",
   "scripts": {
     "test": "nodemon src/api/index-blog.js",
-    "start": "NODE_ENV = production node src/api/index-blog/js"
+    "start": "NODE_ENV = production node src/api/index-blog/js",
+    "pm-start": "pm2 start ./ecosystem.config.js --env production",
+    "pm-test": "pm2 start ./ecosystem.config.js --env development",
+    "pm-stop": "pm2 stop blog",
+    "pm-delete": "pm2 delete blog",
+    "pm-restart": "pm2 stop blog"
   },
   "keywords": [],
   "author": "",
