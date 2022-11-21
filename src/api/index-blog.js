@@ -6,6 +6,8 @@ const https   = require('https');
 const cors    = require('cors');
 var { expressjwt: jwt } = require('express-jwt');
 const routers = require('./routers');
+const fs      = require('fs');
+const path    = require('path');
 
 let unprotected = [
     '/api/auth/',
@@ -33,13 +35,12 @@ if( process.env.NODE_ENV === 'production' ){
     https
         .createServer(
             {
-                key: '',
-                cert: '',
-                ca: ''
+                key  : fs.readFileSync(path.join(__dirname,'./cert/key.pem')),
+                cert : fs.readFileSync(path.join(__dirname,'./cert/cert.pem')),
             },
             app
         )
-        .listen(port,() => console.log(`Listening at http://ec2-18-225-33-135.us-east-2.compute.amazonaws.com:${port}`))
+        .listen(port,() => console.log(`Listening at https://ec2-18-225-33-135.us-east-2.compute.amazonaws.com:${port}`))
 
 }else{
 
