@@ -22,7 +22,9 @@ class UsuarioService{
                 ]
             });
 
-            return new AppResponse(200,usuario)
+            return usuario
+                ? new AppResponse(200, usuario)
+                : new AppResponse(500, null, 'No se encontro informacion del usuario.');
 
         }catch(err){
             throw err;
