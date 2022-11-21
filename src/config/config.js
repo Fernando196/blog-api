@@ -60,3 +60,7 @@ process.env.AWS_SECRET_KEY    = 'm97wXVYeTwsKd6rtOrCGR47HwAvbI1aFbJMnKYHl';
 // AWS FOLDER
 
 process.env.AWS_IMAGES_FOLDER = 'node/image/';
+
+// Certificados
+process.env.PATH_TO_KEY  = '../../../cert/key.pem';
+process.env.PATH_TO_CERT = '../../../cert/cert.pem';

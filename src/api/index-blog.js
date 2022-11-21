@@ -35,8 +35,8 @@ if( process.env.NODE_ENV === 'production' ){
     https
         .createServer(
             {
-                key  : fs.readFileSync('../../../cert/key.pem'),
-                cert : fs.readFileSync('../../../cert/cert.pem'),
+                key  : process.env.PATH_TO_KEY ,
+                cert : process.env.PATH_TO_CERT,
             },
             app
         )
