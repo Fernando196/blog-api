@@ -39,7 +39,7 @@ if( process.env.NODE_ENV === 'production' ){
             },
             app
         )
-        .listen(port,() => console.log(`Listening at http://localhost:${port}`))
+        .listen(port,() => console.log(`Listening at http://ec2-18-225-33-135.us-east-2.compute.amazonaws.com:${port}`))
 
 }else{
 
